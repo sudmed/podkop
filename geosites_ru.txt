@@ -1,10 +1,3 @@
-regexp:.*\.kuper\.ru$
-regexp:.*\.ru$
-regexp:.*\.sber\.ru$
-regexp:.*\.sberbank\.ru$
-regexp:.*\.sbermarket\.ru$
-regexp:.*\.su$
-regexp:.*\.xn--p1ai$
 2gis.ae
 2gis.am
 2gis.az
@@ -81,7 +74,6 @@ ip.oneme.ru
 ip.sb
 ipapi.is
 ipify.org
-iplocate.io
 ipv4-internet.yandex.net
 ipv4.ifconfig.me
 ipv6-internet.yandex.net
