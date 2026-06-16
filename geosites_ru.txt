@@ -196,7 +196,6 @@ westernunion.ru
 whoosh.bike
 wildberries.ru
 ws-api.oneme.ru
-www.iplocate.io
 ya.ru
 yandex-bank.net
 yandex-images.clstorage.net
