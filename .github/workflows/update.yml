@@ -1,10 +1,9 @@
 name: Update Win-Spy Ruleset
 
-# Запускать каждый день в 03:00 UTC
 on:
   schedule:
-    - cron: '0 3 * * *'
-  workflow_dispatch: # Добавляет кнопку для ручного запуска
+    - cron: '0 3 * * *' # Запускать каждый день в 03:00 UTC
+  workflow_dispatch: # Кнопка для ручного запуска
 
 jobs:
   build:
@@ -24,10 +23,33 @@ jobs:
       - name: Run converter script
         run: python convert.py
 
+      - name: Install Hiddify-core v4.1.0 compiler
+        run: |
+          # Скачиваем точно эту версию hiddify-core
+          wget -O hiddify.tar.gz "https://github.com/hiddify/hiddify-core/releases/download/v4.1.0/hiddify-core-linux-amd64.tar.gz"
+          mkdir -p extract_tmp
+          tar -xzf hiddify.tar.gz -C extract_tmp
+          
+          # Находим бинарник (самый большой файл в архиве)
+          BIN=$(find extract_tmp -type f -printf "%s %p\n" | sort -nr | head -n 1 | awk '{print $2}')
+          
+          # Копируем его в систему под именем sing-box, чтобы скрипт его узнал
+          sudo cp "$BIN" /usr/local/bin/sing-box
+          sudo chmod +x /usr/local/bin/sing-box
+          sing-box version
+
+      - name: Compile JSON to SRS (Binary)
+        run: |
+          # Компилируем исходный JSON в бинарный SRS формат
+          sing-box rule-set compile win-spy.json -o win-spy.srs
+
       - name: Commit and Push changes
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add win-spy.json
-          git commit -m "Auto-update win-spy.json" || echo "No changes to commit"
+          
+          # Добавляем оба файла: и текстовый, и бинарный
+          git add win-spy.json win-spy.srs
+          
+          git commit -m "Auto-update win-spy ruleset (JSON + SRS)" || echo "No changes to commit"
           git push || echo "No changes to push"
