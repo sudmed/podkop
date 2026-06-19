@@ -1,0 +1,33 @@
+name: Update Win-Spy Ruleset
+
+# Запускать каждый день в 03:00 UTC
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch: # Добавляет кнопку для ручного запуска
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Run converter script
+        run: python convert.py
+
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add win-spy.json
+          git commit -m "Auto-update win-spy.json" || echo "No changes to commit"
+          git push || echo "No changes to push"
