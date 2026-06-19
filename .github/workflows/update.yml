@@ -23,25 +23,21 @@ jobs:
       - name: Run converter script
         run: python convert.py
 
-      - name: Install Hiddify-core v4.1.0 compiler
+      - name: Install compatible sing-box compiler
         run: |
-          # Скачиваем точно эту версию hiddify-core
-          wget -O hiddify.tar.gz "https://github.com/hiddify/hiddify-core/releases/download/v4.1.0/hiddify-core-linux-amd64.tar.gz"
-          mkdir -p extract_tmp
-          tar -xzf hiddify.tar.gz -C extract_tmp
+          # Скачиваем официальный sing-box версии 1.9.3
+          # Он генерирует бинарники, на 100% совместимые с hiddify-core v4.1.0
+          wget -O sing-box.tar.gz "https://github.com/SagerNet/sing-box/releases/download/v1.9.3/sing-box-1.9.3-linux-amd64.tar.gz"
+          tar -xzf sing-box.tar.gz
           
-          # Находим бинарник (самый большой файл в архиве)
-          BIN=$(find extract_tmp -type f -printf "%s %p\n" | sort -nr | head -n 1 | awk '{print $2}')
-          
-          # Копируем его в систему под именем sing-box, чтобы скрипт его узнал
-          sudo cp "$BIN" /usr/local/bin/sing-box
-          sudo chmod +x /usr/local/bin/sing-box
+          # Копируем бинарник в систему
+          sudo cp sing-box-*/sing-box /usr/local/bin/
           sing-box version
 
       - name: Compile JSON to SRS (Binary)
         run: |
-          # Используем srun для доступа к внутренним командам sing-box внутри ядра Hiddify
-          sing-box srun rule-set compile win-spy.json -o win-spy.srs
+          # Используем стандартную команду компиляции
+          sing-box rule-set compile win-spy.json -o win-spy.srs
 
       - name: Commit and Push changes
         run: |
