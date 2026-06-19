@@ -40,8 +40,8 @@ jobs:
 
       - name: Compile JSON to SRS (Binary)
         run: |
-          # Компилируем исходный JSON в бинарный SRS формат
-          sing-box rule-set compile win-spy.json -o win-spy.srs
+          # Используем srun для доступа к внутренним командам sing-box внутри ядра Hiddify
+          sing-box srun rule-set compile win-spy.json -o win-spy.srs
 
       - name: Commit and Push changes
         run: |
