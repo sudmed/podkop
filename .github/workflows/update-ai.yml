@@ -1,0 +1,43 @@
+name: Update AI Domains Ruleset
+
+on:
+  schedule:
+    - cron: '30 3 * * *' # Будет запускаться каждый день в 03:30 UTC
+  workflow_dispatch: # Кнопка для ручного запуска
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install compatible sing-box compiler (v1.9.3)
+        run: |
+          # Скачиваем ту самую версию, которая идеально совместима с вашим роутером
+          wget -O sing-box.tar.gz "https://github.com/SagerNet/sing-box/releases/download/v1.9.3/sing-box-1.9.3-linux-amd64.tar.gz"
+          tar -xzf sing-box.tar.gz
+          sudo cp sing-box-*/sing-box /usr/local/bin/
+          sing-box version
+
+      - name: Download JSON and Compile to SRS
+        run: |
+          # 1. Скачиваем исходный JSON файл
+          wget -O ai_domains.json "https://raw.githubusercontent.com/sudmed/podkop/refs/heads/main/ai_domains.json"
+          
+          # 2. Компилируем его в бинарный формат
+          sing-box rule-set compile ai_domains.json -o ai_domains.srs
+
+      - name: Commit and Push changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # Сохраняем в репозиторий и исходник (JSON), и готовый бинарник (SRS)
+          git add ai_domains.json ai_domains.srs
+          
+          git commit -m "Auto-update AI domains (JSON + SRS)" || echo "No changes to commit"
+          git push || echo "No changes to push"
